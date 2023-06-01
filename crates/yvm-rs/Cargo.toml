@@ -1,28 +1,26 @@
 [package]
-name = "svm-rs"
+name = "yvm-rs"
 version = "0.2.23"
 edition = "2021"
 rust-version = "1.65"
 authors = ["Rohit Narurkar <rohit.narurkar@protonmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "../../README.md"
-repository = "https://github.com/roynalnaruto/svm-rs"
-homepage = "https://github.com/roynalnaruto/svm-rs"
 description = "Solidity compiler Version Manager"
 
 [lib]
-name = "svm_lib"
+name = "yvm_lib"
 path = "src/lib.rs"
 
 [[bin]]
-name = "svm"
-path = "src/bin/svm-bin/main.rs"
+name = "yvm"
+path = "src/bin/yvm-bin/main.rs"
 required-features = ["cli"]
 
 [[bin]]
-name = "solc"
-path = "src/bin/solc/main.rs"
-required-features = ["solc"]
+name = "ylem"
+path = "src/bin/ylem/main.rs"
+required-features = ["ylem"]
 
 [dependencies]
 fs2 = "0.4"
@@ -58,7 +56,7 @@ tempfile = "3.5"
 tokio = { version = "1.28", features = ["rt-multi-thread", "macros"] }
 
 [features]
-default = ["rustls", "cli", "solc"]
+default = ["rustls", "cli", "ylem"]
 
 # lib
 openssl = ["reqwest/native-tls"]
@@ -67,7 +65,7 @@ blocking = ["reqwest/blocking"]
 
 # bin
 cli = ["anyhow", "clap", "console", "dialoguer", "indicatif", "itertools", "tokio"]
-solc = ["anyhow"]
+ylem = ["anyhow"]
 
 # deprecated
 sha2-asm = []

@@ -1,5 +1,5 @@
 [package]
-name = "svm-rs-builds"
+name = "yvm-rs-builds"
 version = "0.1.15"
 edition = "2021"
 rust-version = "1.65"
@@ -9,12 +9,9 @@ authors = [
 ]
 license = "MIT OR Apache-2.0"
 readme = "../../README.md"
-repository = "https://github.com/roynalnaruto/svm-rs"
-homepage = "https://github.com/roynalnaruto/svm-rs"
-description = "Solidity compiler builds"
 
 [build-dependencies]
-svm = { package = "svm-rs", path = "../svm-rs", version = "0.2.23", default-features = false, features = [
+yvm = { package = "yvm-rs", path = "../yvm-rs", version = "0.2.23", default-features = false, features = [
     "blocking",
     "rustls",
 ] }

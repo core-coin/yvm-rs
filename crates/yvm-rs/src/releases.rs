@@ -8,18 +8,18 @@ use serde::{
 use std::collections::BTreeMap;
 use url::Url;
 
-use crate::{error::SolcVmError, platform::Platform};
+use crate::{error::YlemVmError, platform::Platform};
 
-const SOLC_RELEASES_URL: &str = "https://binaries.soliditylang.org";
+const YLEM_RELEASES_URL: &str = "https://binaries.soliditylang.org";
 
-const OLD_SOLC_RELEASES_DOWNLOAD_PREFIX: &str =
+const OLD_YLEM_RELEASES_DOWNLOAD_PREFIX: &str =
     "https://raw.githubusercontent.com/crytic/solc/master/linux/amd64";
 
 static OLD_VERSION_MAX: Lazy<Version> = Lazy::new(|| Version::new(0, 4, 9));
 
 static OLD_VERSION_MIN: Lazy<Version> = Lazy::new(|| Version::new(0, 4, 0));
 
-static OLD_SOLC_RELEASES: Lazy<Releases> = Lazy::new(|| {
+static OLD_YLEM_RELEASES: Lazy<Releases> = Lazy::new(|| {
     serde_json::from_str(include_str!("../list/linux-arm64-old.json"))
         .expect("could not parse list linux-arm64-old.json")
 });
@@ -50,8 +50,8 @@ static MACOS_AARCH64_RELEASES_URL: &str =
 ///         }
 ///     ]
 ///     "releases": {
-///         "0.8.7": "solc-macosx-amd64-v0.8.7+commit.e28d00a7",
-///         "0.8.6": "solc-macosx-amd64-v0.8.6+commit.11564f7e",
+///         "0.8.7": "ylem-macosx-amd64-v0.8.7+commit.e28d00a7",
+///         "0.8.6": "ylem-macosx-amd64-v0.8.6+commit.11564f7e",
 ///         ...
 ///     }
 /// }
@@ -64,7 +64,7 @@ pub struct Releases {
 }
 
 impl Releases {
-    /// Get the checksum of a solc version's binary if it exists.
+    /// Get the checksum of a ylem version's binary if it exists.
     pub fn get_checksum(&self, v: &Version) -> Option<Vec<u8>> {
         for build in self.builds.iter() {
             if build.version.eq(v) {
@@ -87,7 +87,7 @@ impl Releases {
     }
 }
 
-/// Build info contains the SHA256 checksum of a solc binary.
+/// Build info contains the SHA256 checksum of a ylem binary.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BuildInfo {
     pub version: Version,
@@ -120,7 +120,7 @@ mod hex_string {
 
 /// Blocking version fo [`all_realeases`]
 #[cfg(feature = "blocking")]
-pub fn blocking_all_releases(platform: Platform) -> Result<Releases, SolcVmError> {
+pub fn blocking_all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     if platform == Platform::LinuxAarch64 {
         return Ok(reqwest::blocking::get(LINUX_AARCH64_RELEASES_URL)?.json::<Releases>()?);
     }
@@ -136,7 +136,7 @@ pub fn blocking_all_releases(platform: Platform) -> Result<Releases, SolcVmError
         let mut native = reqwest::blocking::get(MACOS_AARCH64_RELEASES_URL)?.json::<Releases>()?;
         let mut releases = reqwest::blocking::get(format!(
             "{}/{}/list.json",
-            SOLC_RELEASES_URL,
+            YLEM_RELEASES_URL,
             Platform::MacOsAmd64,
         ))?
         .json::<Releases>()?;
@@ -148,13 +148,13 @@ pub fn blocking_all_releases(platform: Platform) -> Result<Releases, SolcVmError
         return Ok(releases);
     }
 
-    let releases = reqwest::blocking::get(format!("{SOLC_RELEASES_URL}/{platform}/list.json"))?
+    let releases = reqwest::blocking::get(format!("{YLEM_RELEASES_URL}/{platform}/list.json"))?
         .json::<Releases>()?;
     Ok(unified_releases(releases, platform))
 }
 
 /// Fetch all releases available for the provided platform.
-pub async fn all_releases(platform: Platform) -> Result<Releases, SolcVmError> {
+pub async fn all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     if platform == Platform::LinuxAarch64 {
         return Ok(get(LINUX_AARCH64_RELEASES_URL)
             .await?
@@ -176,7 +176,7 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, SolcVmError> {
             .await?;
         let mut releases = get(format!(
             "{}/{}/list.json",
-            SOLC_RELEASES_URL,
+            YLEM_RELEASES_URL,
             Platform::MacOsAmd64,
         ))
         .await?
@@ -192,7 +192,7 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, SolcVmError> {
         return Ok(releases);
     }
 
-    let releases = get(format!("{SOLC_RELEASES_URL}/{platform}/list.json"))
+    let releases = get(format!("{YLEM_RELEASES_URL}/{platform}/list.json"))
         .await?
         .json::<Releases>()
         .await?;
@@ -203,7 +203,7 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, SolcVmError> {
 /// unifies the releases with old releases if on linux
 fn unified_releases(releases: Releases, platform: Platform) -> Releases {
     if platform == Platform::LinuxAmd64 {
-        let mut all_releases = OLD_SOLC_RELEASES.clone();
+        let mut all_releases = OLD_YLEM_RELEASES.clone();
         all_releases.builds.extend(releases.builds);
         all_releases.releases.extend(releases.releases);
         all_releases
@@ -212,18 +212,18 @@ fn unified_releases(releases: Releases, platform: Platform) -> Releases {
     }
 }
 
-/// Construct the URL to the Solc binary for the specified release version and target platform.
+/// Construct the URL to the Ylem binary for the specified release version and target platform.
 pub fn artifact_url(
     platform: Platform,
     version: &Version,
     artifact: &str,
-) -> Result<Url, SolcVmError> {
+) -> Result<Url, YlemVmError> {
     if platform == Platform::LinuxAmd64
         && version.le(&OLD_VERSION_MAX)
         && version.ge(&OLD_VERSION_MIN)
     {
         return Ok(Url::parse(&format!(
-            "{OLD_SOLC_RELEASES_DOWNLOAD_PREFIX}/{artifact}"
+            "{OLD_YLEM_RELEASES_DOWNLOAD_PREFIX}/{artifact}"
         ))?);
     }
 
@@ -233,7 +233,7 @@ pub fn artifact_url(
                 "{LINUX_AARCH64_URL_PREFIX}/{artifact}"
             ))?);
         } else {
-            return Err(SolcVmError::UnsupportedVersion(
+            return Err(YlemVmError::UnsupportedVersion(
                 version.to_string(),
                 platform.to_string(),
             ));
@@ -241,7 +241,7 @@ pub fn artifact_url(
     }
 
     if platform == Platform::MacOsAmd64 && version.lt(&OLD_VERSION_MIN) {
-        return Err(SolcVmError::UnsupportedVersion(
+        return Err(YlemVmError::UnsupportedVersion(
             version.to_string(),
             platform.to_string(),
         ));
@@ -255,7 +255,7 @@ pub fn artifact_url(
         } else {
             return Ok(Url::parse(&format!(
                 "{}/{}/{}",
-                SOLC_RELEASES_URL,
+                YLEM_RELEASES_URL,
                 Platform::MacOsAmd64,
                 artifact,
             ))?);
@@ -263,7 +263,7 @@ pub fn artifact_url(
     }
 
     Ok(Url::parse(&format!(
-        "{SOLC_RELEASES_URL}/{platform}/{artifact}"
+        "{YLEM_RELEASES_URL}/{platform}/{artifact}"
     ))?)
 }
 
@@ -273,8 +273,8 @@ mod tests {
 
     #[test]
     fn test_old_releases_deser() {
-        assert_eq!(OLD_SOLC_RELEASES.releases.len(), 10);
-        assert_eq!(OLD_SOLC_RELEASES.builds.len(), 10);
+        assert_eq!(OLD_YLEM_RELEASES.releases.len(), 10);
+        assert_eq!(OLD_YLEM_RELEASES.builds.len(), 10);
     }
 
     #[tokio::test]
@@ -296,7 +296,7 @@ mod tests {
             releases.get_artifact(&native).unwrap(),
         )
         .expect("could not fetch artifact URL");
-        assert!(url1.to_string().contains(SOLC_RELEASES_URL));
+        assert!(url1.to_string().contains(YLEM_RELEASES_URL));
         assert!(url2.to_string().contains(MACOS_AARCH64_URL_PREFIX));
     }
 

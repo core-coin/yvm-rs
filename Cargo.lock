@@ -1315,44 +1315,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
-name = "svm-rs"
-version = "0.2.23"
-dependencies = [
- "anyhow",
- "clap",
- "console",
- "dialoguer",
- "dirs",
- "fs2",
- "hex",
- "indicatif",
- "itertools",
- "once_cell",
- "rand",
- "reqwest",
- "semver",
- "serde",
- "serde_json",
- "sha2",
- "tempfile",
- "thiserror",
- "tokio",
- "url",
- "zip",
-]
-
-[[package]]
-name = "svm-rs-builds"
-version = "0.1.15"
-dependencies = [
- "build_const",
- "hex",
- "semver",
- "serde_json",
- "svm-rs",
-]
-
-[[package]]
 name = "syn"
 version = "2.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1877,6 +1839,44 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "80d0f4e272c85def139476380b12f9ac60926689dd2e01d4923222f40580869d"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "yvm-rs"
+version = "0.2.23"
+dependencies = [
+ "anyhow",
+ "clap",
+ "console",
+ "dialoguer",
+ "dirs",
+ "fs2",
+ "hex",
+ "indicatif",
+ "itertools",
+ "once_cell",
+ "rand",
+ "reqwest",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "url",
+ "zip",
+]
+
+[[package]]
+name = "yvm-rs-builds"
+version = "0.1.15"
+dependencies = [
+ "build_const",
+ "hex",
+ "semver",
+ "serde_json",
+ "yvm-rs",
 ]
 
 [[package]]
