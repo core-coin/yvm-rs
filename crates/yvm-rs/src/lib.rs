@@ -496,6 +496,7 @@ mod tests {
 
         assert!(String::from_utf8_lossy(&output.stdout)
             .as_ref()
+            // CORETODO: Compiler needs to be changed so it prints out the correct version
             .contains("0.8.4"));
     }
 

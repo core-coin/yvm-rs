@@ -103,11 +103,11 @@ mod hex_string {
 #[cfg(feature = "blocking")]
 pub fn blocking_all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     if platform == Platform::LinuxAarch64 {
-        return Ok(YLEM_AARCH_RELEASES.clone());
+        Ok(YLEM_AARCH_RELEASES.clone())
     } else if platform == Platform::LinuxAmd64 {
-        return Ok(YLEM_AMD_RELEASES.clone());
+        Ok(YLEM_AMD_RELEASES.clone())
     } else {
-        return Err(YlemVmError::UnsupportedPlatform(platform));
+        Err(YlemVmError::UnsupportedPlatform(platform))
     }
 
     // CORETODO: Currently MacOs is not supported
@@ -142,11 +142,11 @@ pub fn blocking_all_releases(platform: Platform) -> Result<Releases, YlemVmError
 /// Fetch all releases available for the provided platform.
 pub async fn all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     if platform == Platform::LinuxAarch64 {
-        return Ok(YLEM_AARCH_RELEASES.clone());
+        Ok(YLEM_AARCH_RELEASES.clone())
     } else if platform == Platform::LinuxAmd64 {
-        return Ok(YLEM_AMD_RELEASES.clone());
+        Ok(YLEM_AMD_RELEASES.clone())
     } else {
-        return Err(YlemVmError::UnsupportedPlatform(platform));
+        Err(YlemVmError::UnsupportedPlatform(platform))
     }
 
     // if platform == Platform::LinuxAarch64 {
@@ -218,7 +218,7 @@ pub fn artifact_url(
         return Ok(Url::parse(&format!("{YLEM_RELEASES_URL}/{v}/{artifact}"))?);
     }
 
-    return Err(YlemVmError::UnsupportedPlatform(platform));
+    Err(YlemVmError::UnsupportedPlatform(platform))
 }
 
 // #[cfg(test)]
