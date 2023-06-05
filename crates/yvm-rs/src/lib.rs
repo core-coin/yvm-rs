@@ -428,12 +428,14 @@ mod tests {
 
     #[tokio::test]
     async fn test_artifact_url() {
-        let version = Version::new(0, 5, 0);
-        let artifact = "ylem-v0.5.0";
+        let mut version = String::from("v");
+        let v = Version::new(0, 0, 18);
+        version.push_str(&v.to_string());
+        let artifact = "ylem-linux-arm64";
         assert_eq!(
-            artifact_url(Platform::LinuxAarch64, &version, artifact).unwrap(),
+            artifact_url(Platform::LinuxAarch64, &v, artifact).unwrap(),
             Url::parse(&format!(
-                "https://github.com/nikitastupin/solc/raw/0e071f4e18220d314689d4742e22e0ca5dfc13f6/linux/aarch64/{artifact}"
+                "https://github.com/core-coin/ylem/releases/download/{version}/{artifact}"
             ))
             .unwrap(),
         )
@@ -448,7 +450,7 @@ mod tests {
             .into_keys()
             .collect::<Vec<Version>>();
         let rand_version = versions.choose(&mut rand::thread_rng()).unwrap();
-        assert!(install(rand_version).await.is_ok());
+        install(rand_version).await.unwrap();
     }
 
     #[cfg(feature = "blocking")]
@@ -458,14 +460,14 @@ mod tests {
             .unwrap()
             .into_versions();
         let rand_version = versions.choose(&mut rand::thread_rng()).unwrap();
-        assert!(blocking_install(rand_version).is_ok());
+        blocking_install(rand_version).unwrap();
     }
 
     #[tokio::test]
     async fn test_version() {
-        let version = "0.8.10".parse().unwrap();
+        let version = "0.0.19".parse().unwrap();
         install(&version).await.unwrap();
-        let solc_path = version_path(version.to_string().as_str()).join(format!("solc-{version}"));
+        let solc_path = version_path(version.to_string().as_str()).join(format!("ylem-{version}"));
         let output = Command::new(solc_path)
             .arg("--version")
             .stdin(Stdio::piped())
@@ -473,18 +475,17 @@ mod tests {
             .stdout(Stdio::piped())
             .output()
             .unwrap();
-
         assert!(String::from_utf8_lossy(&output.stdout)
             .as_ref()
-            .contains("0.8.10"));
+            .contains("0.8.4"));
     }
 
     #[cfg(feature = "blocking")]
     #[test]
     fn blocking_test_version() {
-        let version = "0.8.10".parse().unwrap();
+        let version = "0.0.19".parse().unwrap();
         blocking_install(&version).unwrap();
-        let solc_path = version_path(version.to_string().as_str()).join(format!("solc-{version}"));
+        let solc_path = version_path(version.to_string().as_str()).join(format!("ylem-{version}"));
         let output = Command::new(solc_path)
             .arg("--version")
             .stdin(Stdio::piped())
@@ -495,13 +496,13 @@ mod tests {
 
         assert!(String::from_utf8_lossy(&output.stdout)
             .as_ref()
-            .contains("0.8.10"));
+            .contains("0.8.4"));
     }
 
     #[cfg(feature = "blocking")]
     #[test]
     fn can_install_parallel() {
-        let version: Version = "0.8.10".parse().unwrap();
+        let version: Version = "0.0.19".parse().unwrap();
         let cloned_version = version.clone();
         let t = std::thread::spawn(move || blocking_install(&cloned_version));
         blocking_install(&version).unwrap();
@@ -510,53 +511,10 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn can_install_parallel_async() {
-        let version: Version = "0.8.10".parse().unwrap();
+        let version: Version = "0.0.19".parse().unwrap();
         let cloned_version = version.clone();
         let t = tokio::task::spawn(async move { install(&cloned_version).await });
         install(&version).await.unwrap();
         t.await.unwrap().unwrap();
-    }
-
-    // ensures we can download the latest native solc for apple silicon
-    #[tokio::test(flavor = "multi_thread")]
-    async fn can_download_latest_native_apple_silicon() {
-        let latest: Version = "0.8.20".parse().unwrap();
-
-        let artifacts = all_releases(Platform::MacOsAarch64).await.unwrap();
-
-        let artifact = artifacts.releases.get(&latest).unwrap();
-        let download_url = artifact_url(
-            Platform::MacOsAarch64,
-            &latest,
-            artifact.to_string().as_str(),
-        )
-        .unwrap();
-
-        let checksum = artifacts.get_checksum(&latest).unwrap();
-
-        let resp = reqwest::get(download_url).await.unwrap();
-        assert!(resp.status().is_success());
-        let binbytes = resp.bytes().await.unwrap();
-        ensure_checksum(&binbytes, &latest, checksum).unwrap();
-    }
-
-    #[tokio::test]
-    #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
-    async fn can_install_windows_zip_release() {
-        let version = "0.7.1".parse().unwrap();
-        install(&version).await.unwrap();
-        let solc_path =
-            version_path(version.to_string().as_str()).join(&format!("solc-{}", version));
-        let output = Command::new(&solc_path)
-            .arg("--version")
-            .stdin(Stdio::piped())
-            .stderr(Stdio::piped())
-            .stdout(Stdio::piped())
-            .output()
-            .unwrap();
-
-        assert!(String::from_utf8_lossy(&output.stdout)
-            .as_ref()
-            .contains("0.7.1"));
     }
 }

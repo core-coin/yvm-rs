@@ -2,9 +2,13 @@ use reqwest::StatusCode;
 use thiserror::Error;
 use url::Url;
 
+use crate::Platform;
+
 /// Error types from the yvm_lib crate.
 #[derive(Debug, Error)]
 pub enum YlemVmError {
+    #[error("Unsupported platform {0}. Currently only linux is supported.")]
+    UnsupportedPlatform(Platform),
     #[error("YVM global version not set")]
     GlobalVersionNotSet,
     #[error("Unknown version provided")]
