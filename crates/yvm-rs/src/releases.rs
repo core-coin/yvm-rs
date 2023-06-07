@@ -99,7 +99,7 @@ mod hex_string {
     }
 }
 
-/// Blocking version fo [`all_realeases`]
+/// Blocking version for [`all_realeases`]
 #[cfg(feature = "blocking")]
 pub fn blocking_all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     if platform == Platform::LinuxAarch64 {
@@ -109,34 +109,6 @@ pub fn blocking_all_releases(platform: Platform) -> Result<Releases, YlemVmError
     } else {
         Err(YlemVmError::UnsupportedPlatform(platform))
     }
-
-    // CORETODO: Currently MacOs is not supported
-    // if platform == Platform::MacOsAarch64 {
-    //     // The supported versions for both macos-amd64 and macos-aarch64 are the same.
-    //     //
-    //     // 1. For version >= 0.8.5 we fetch native releases from
-    //     // https://github.com/ethers-rs/solc-builds
-    //     //
-    //     // 2. For version <= 0.8.4 we fetch releases from https://binaries.soliditylang.org and
-    //     // require Rosetta support.
-    //     let mut native = reqwest::blocking::get(MACOS_AARCH64_RELEASES_URL)?.json::<Releases>()?;
-    //     let mut releases = reqwest::blocking::get(format!(
-    //         "{}/{}/list.json",
-    //         YLEM_RELEASES_URL,
-    //         Platform::MacOsAmd64,
-    //     ))?
-    //     .json::<Releases>()?;
-    //     releases
-    //         .builds
-    //         .retain(|b| b.version.lt(&MACOS_AARCH64_NATIVE));
-    //     releases.builds.extend_from_slice(&native.builds);
-    //     releases.releases.append(&mut native.releases);
-    //     return Ok(releases);
-    // }
-
-    // let releases = reqwest::blocking::get(format!("{YLEM_RELEASES_URL}/{platform}/list.json"))?
-    //     .json::<Releases>()?;
-    // Ok(unified_releases(releases, platform))
 }
 
 /// Fetch all releases available for the provided platform.
@@ -149,62 +121,7 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
         Err(YlemVmError::UnsupportedPlatform(platform))
     }
 
-    // if platform == Platform::LinuxAarch64 {
-    //     return Ok(get(LINUX_AARCH64_RELEASES_URL)
-    //         .await?
-    //         .json::<Releases>()
-    //         .await?);
-    // }
-
-    // if platform == Platform::MacOsAarch64 {
-    //     // The supported versions for both macos-amd64 and macos-aarch64 are the same.
-    //     //
-    //     // 1. For version >= 0.8.5 we fetch native releases from
-    //     // https://github.com/ethers-rs/solc-builds
-    //     //
-    //     // 2. For version <= 0.8.4 we fetch releases from https://binaries.soliditylang.org and
-    //     // require Rosetta support.
-    //     let mut native = get(MACOS_AARCH64_RELEASES_URL)
-    //         .await?
-    //         .json::<Releases>()
-    //         .await?;
-    //     let mut releases = get(format!(
-    //         "{}/{}/list.json",
-    //         YLEM_RELEASES_URL,
-    //         Platform::MacOsAmd64,
-    //     ))
-    //     .await?
-    //     .json::<Releases>()
-    //     .await?;
-    //     releases
-    //         .builds
-    //         .retain(|b| b.version.lt(&MACOS_AARCH64_NATIVE));
-    //     releases.releases.retain(|v, _| v.lt(&MACOS_AARCH64_NATIVE));
-
-    //     releases.builds.extend_from_slice(&native.builds);
-    //     releases.releases.append(&mut native.releases);
-    //     return Ok(releases);
-    // }
-
-    // let releases = get(format!("{YLEM_RELEASES_URL}/{platform}/list.json"))
-    //     .await?
-    //     .json::<Releases>()
-    //     .await?;
-
-    // Ok(unified_releases(releases, platform))
 }
-
-// unifies the releases with old releases if on linux
-// fn unified_releases(releases: Releases, platform: Platform) -> Releases {
-//     if platform == Platform::LinuxAmd64 {
-//         let mut all_releases = OLD_YLEM_RELEASES.clone();
-//         all_releases.builds.extend(releases.builds);
-//         all_releases.releases.extend(releases.releases);
-//         all_releases
-//     } else {
-//         releases
-//     }
-// }
 
 /// Construct the URL to the Ylem binary for the specified release version and target platform.
 pub fn artifact_url(
@@ -220,65 +137,3 @@ pub fn artifact_url(
 
     Err(YlemVmError::UnsupportedPlatform(platform))
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn test_old_releases_deser() {
-//         assert_eq!(OLD_YLEM_RELEASES.releases.len(), 10);
-//         assert_eq!(OLD_YLEM_RELEASES.builds.len(), 10);
-//     }
-
-//     #[tokio::test]
-//     async fn test_macos_aarch64() {
-//         let releases = all_releases(Platform::MacOsAarch64)
-//             .await
-//             .expect("could not fetch releases for macos-aarch64");
-//         let rosetta = Version::new(0, 8, 4);
-//         let native = MACOS_AARCH64_NATIVE.clone();
-//         let url1 = artifact_url(
-//             Platform::MacOsAarch64,
-//             &rosetta,
-//             releases.get_artifact(&rosetta).unwrap(),
-//         )
-//         .expect("could not fetch artifact URL");
-//         let url2 = artifact_url(
-//             Platform::MacOsAarch64,
-//             &native,
-//             releases.get_artifact(&native).unwrap(),
-//         )
-//         .expect("could not fetch artifact URL");
-//         assert!(url1.to_string().contains(YLEM_RELEASES_URL));
-//         assert!(url2.to_string().contains(MACOS_AARCH64_URL_PREFIX));
-//     }
-
-//     #[tokio::test]
-//     async fn test_all_releases_macos_amd64() {
-//         assert!(all_releases(Platform::MacOsAmd64).await.is_ok());
-//     }
-
-//     #[tokio::test]
-//     async fn test_all_releases_macos_aarch64() {
-//         assert!(all_releases(Platform::MacOsAarch64).await.is_ok());
-//     }
-
-//     #[tokio::test]
-//     async fn test_all_releases_linux_amd64() {
-//         assert!(all_releases(Platform::LinuxAmd64).await.is_ok());
-//     }
-
-//     #[tokio::test]
-//     async fn test_all_releases_linux_aarch64() {
-//         assert!(all_releases(Platform::LinuxAarch64).await.is_ok());
-//     }
-
-//     #[tokio::test]
-//     async fn releases_roundtrip() {
-//         let releases = all_releases(Platform::LinuxAmd64).await.unwrap();
-//         let s = serde_json::to_string(&releases).unwrap();
-//         let de_releases: Releases = serde_json::from_str(&s).unwrap();
-//         assert_eq!(releases, de_releases);
-//     }
-// }
