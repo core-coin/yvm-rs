@@ -120,7 +120,6 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, YlemVmError> {
     } else {
         Err(YlemVmError::UnsupportedPlatform(platform))
     }
-
 }
 
 /// Construct the URL to the Ylem binary for the specified release version and target platform.
@@ -129,10 +128,10 @@ pub fn artifact_url(
     version: &Version,
     artifact: &str,
 ) -> Result<Url, YlemVmError> {
-    let mut v = String::from("v");
-    v.push_str(&version.to_string());
     if platform == Platform::LinuxAmd64 || platform == Platform::LinuxAarch64 {
-        return Ok(Url::parse(&format!("{YLEM_RELEASES_URL}/{v}/{artifact}"))?);
+        return Ok(Url::parse(&format!(
+            "{YLEM_RELEASES_URL}/{version}/{artifact}"
+        ))?);
     }
 
     Err(YlemVmError::UnsupportedPlatform(platform))

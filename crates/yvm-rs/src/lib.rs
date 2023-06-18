@@ -428,12 +428,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_artifact_url() {
-        let mut version = String::from("v");
-        let v = Version::new(0, 0, 18);
-        version.push_str(&v.to_string());
+        let version = Version::new(1, 0, 1);
         let artifact = "ylem-linux-arm64";
         assert_eq!(
-            artifact_url(Platform::LinuxAarch64, &v, artifact).unwrap(),
+            artifact_url(Platform::LinuxAarch64, &version, artifact).unwrap(),
             Url::parse(&format!(
                 "https://github.com/core-coin/ylem/releases/download/{version}/{artifact}"
             ))
@@ -465,10 +463,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_version() {
-        let version = "0.0.19".parse().unwrap();
+        let version = "1.0.1".parse().unwrap();
         install(&version).await.unwrap();
-        let solc_path = version_path(version.to_string().as_str()).join(format!("ylem-{version}"));
-        let output = Command::new(solc_path)
+        let ylem_path = version_path(version.to_string().as_str()).join(format!("ylem-{version}"));
+        let output = Command::new(ylem_path)
             .arg("--version")
             .stdin(Stdio::piped())
             .stderr(Stdio::piped())
@@ -477,13 +475,13 @@ mod tests {
             .unwrap();
         assert!(String::from_utf8_lossy(&output.stdout)
             .as_ref()
-            .contains("0.8.4"));
+            .contains("1.0.1"));
     }
 
     #[cfg(feature = "blocking")]
     #[test]
     fn blocking_test_version() {
-        let version = "0.0.19".parse().unwrap();
+        let version = "1.0.1".parse().unwrap();
         blocking_install(&version).unwrap();
         let solc_path = version_path(version.to_string().as_str()).join(format!("ylem-{version}"));
         let output = Command::new(solc_path)
@@ -496,14 +494,13 @@ mod tests {
 
         assert!(String::from_utf8_lossy(&output.stdout)
             .as_ref()
-            // CORETODO: Compiler needs to be changed so it prints out the correct version
-            .contains("0.8.4"));
+            .contains("1.0.1"));
     }
 
     #[cfg(feature = "blocking")]
     #[test]
     fn can_install_parallel() {
-        let version: Version = "0.0.19".parse().unwrap();
+        let version: Version = "1.0.1".parse().unwrap();
         let cloned_version = version.clone();
         let t = std::thread::spawn(move || blocking_install(&cloned_version));
         blocking_install(&version).unwrap();
@@ -512,7 +509,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread")]
     async fn can_install_parallel_async() {
-        let version: Version = "0.0.19".parse().unwrap();
+        let version: Version = "1.0.1".parse().unwrap();
         let cloned_version = version.clone();
         let t = tokio::task::spawn(async move { install(&cloned_version).await });
         install(&version).await.unwrap();
