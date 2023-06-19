@@ -59,7 +59,7 @@ fn resolve_data_dir() -> PathBuf {
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Version beyond which ylem binaries are not fully static, hence need to be patched for NixOS.
-static NIXOS_PATCH_REQ: Lazy<VersionReq> = Lazy::new(|| VersionReq::parse(">=0.7.6").unwrap());
+static NIXOS_PATCH_REQ: Lazy<VersionReq> = Lazy::new(|| VersionReq::parse("^1.0.1").unwrap());
 
 // Installer type that copies binary data to the appropriate ylem binary file:
 // 1. create target file to copy binary data
