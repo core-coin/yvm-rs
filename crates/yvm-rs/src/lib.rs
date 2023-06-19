@@ -31,12 +31,12 @@ pub static YVM_DATA_DIR: Lazy<PathBuf> = Lazy::new(|| {
     #[cfg(test)]
     {
         let dir = tempfile::tempdir().expect("could not create temp directory");
-        dir.path().join(".svm")
+        dir.path().join(".yvm")
     }
     #[cfg(not(test))]
     {
-        let mut user_home = home::home_dir().expect("could not detect user home directory");
-        user_home.push(".svm");
+        let mut user_home = dirs::home_dir().expect("could not detect user home directory");
+        user_home.push(".yvm");
         user_home
     }
 });
@@ -56,6 +56,7 @@ pub static YVM_DATA_DIR: Lazy<PathBuf> = Lazy::new(|| {
 //     }
 // });
 
+#[allow(dead_code)]
 fn resolve_data_dir() -> PathBuf {
     let home_dir = dirs::home_dir()
         .expect("could not detect user home directory")
