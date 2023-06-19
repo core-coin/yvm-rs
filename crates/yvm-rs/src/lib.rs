@@ -27,7 +27,7 @@ pub use releases::{all_releases, Releases};
 #[cfg(feature = "blocking")]
 pub use releases::blocking_all_releases;
 
-pub static YVM_HOME: Lazy<PathBuf> = Lazy::new(|| {
+pub static YVM_DATA_DIR: Lazy<PathBuf> = Lazy::new(|| {
     #[cfg(test)]
     {
         let dir = tempfile::tempdir().expect("could not create temp directory");
@@ -44,17 +44,17 @@ pub static YVM_HOME: Lazy<PathBuf> = Lazy::new(|| {
 /// Declare path to Ylem Version Manager's home directory
 /// On unix-based machines, if "~/.yvm" already exists, then keep using it.
 /// Otherwise, use $XDG_DATA_HOME or ~/.local/share/yvm
-pub static YVM_DATA_DIR: Lazy<PathBuf> = Lazy::new(|| {
-    #[cfg(test)]
-    {
-        let dir = tempfile::tempdir().expect("could not create temp directory");
-        dir.path().join(".yvm")
-    }
-    #[cfg(not(test))]
-    {
-        resolve_data_dir()
-    }
-});
+// pub static YVM_DATA_DIR: Lazy<PathBuf> = Lazy::new(|| {
+//     #[cfg(test)]
+//     {
+//         let dir = tempfile::tempdir().expect("could not create temp directory");
+//         dir.path().join(".yvm")
+//     }
+//     #[cfg(not(test))]
+//     {
+//         resolve_data_dir()
+//     }
+// });
 
 fn resolve_data_dir() -> PathBuf {
     let home_dir = dirs::home_dir()
