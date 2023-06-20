@@ -1,11 +1,16 @@
 {
     "builds": [
         {
+            "version": "1.0.0",
+            "sha256": "a8f34c2af424033ebd27cccadc23c36c74a3e635b44742b61c1d1124d93eb6c1"
+        },
+        {
             "version": "1.0.1",
             "sha256": "a8f34c2af424033ebd27cccadc23c36c74a3e635b44742b61c1d1124d93eb6c1"
         }
     ],
     "releases": {
+        "1.0.0": "ylem-linux-arm64",
         "1.0.1": "ylem-linux-arm64"
     }
 }
